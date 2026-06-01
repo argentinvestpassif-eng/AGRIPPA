@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carré Magique de la Lune — Agrippa</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a84c;--gold-light:#f0d080;--gold-dim:#8a6a2a;
+  --bg:#06061a;--bg2:#0d0d2e;--bg3:#12123a;--bg4:#1a1a4e;
+  --text:#e0e0f0;--text-dim:#8888aa;--text-muted:#555577;
+  --red-dark:#6b0000;--blue-dark:#0e1f4a;--blue-mid:#1a3a6e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Text',serif;min-height:100vh;overflow-x:hidden}
+
+/* STARS BG */
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:
+  radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,.6) 0%,transparent 100%),
+  radial-gradient(1px 1px at 25% 40%,rgba(255,255,255,.4) 0%,transparent 100%),
+  radial-gradient(1px 1px at 40% 10%,rgba(255,255,255,.7) 0%,transparent 100%),
+  radial-gradient(1px 1px at 55% 30%,rgba(255,255,255,.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 70% 20%,rgba(255,255,255,.5) 0%,transparent 100%),
+  radial-gradient(1px 1px at 85% 45%,rgba(255,255,255,.4) 0%,transparent 100%),
+  radial-gradient(1px 1px at 15% 70%,rgba(255,255,255,.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 60% 80%,rgba(255,255,255,.5) 0%,transparent 100%),
+  radial-gradient(1px 1px at 90% 60%,rgba(255,255,255,.4) 0%,transparent 100%),
+  radial-gradient(1px 1px at 35% 85%,rgba(255,255,255,.6) 0%,transparent 100%),
+  radial-gradient(1px 1px at 75% 90%,rgba(255,255,255,.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 5% 50%,rgba(255,255,255,.5) 0%,transparent 100%),
+  var(--bg);pointer-events:none;z-index:0}
+
+.container{max-width:800px;margin:0 auto;padding:24px 16px;position:relative;z-index:1}
+
+/* HEADER */
+.header{text-align:center;padding:32px 0 24px;border-bottom:1px solid rgba(201,168,76,.2);margin-bottom:28px}
+.moon-icon{font-size:48px;display:block;margin-bottom:12px;animation:moonpulse 4s ease-in-out infinite}
+@keyframes moonpulse{0%,100%{text-shadow:0 0 20px rgba(201,168,76,.4)}50%{text-shadow:0 0 40px rgba(201,168,76,.8),0 0 60px rgba(201,168,76,.3)}}
+.header h1{font-family:'Cinzel',serif;font-size:clamp(20px,4vw,32px);color:var(--gold);letter-spacing:.05em;line-height:1.2;margin-bottom:6px}
+.header p{font-size:14px;color:var(--text-dim);font-style:italic}
+.header .stats{display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .n{font-family:'Cinzel',serif;font-size:22px;color:var(--gold-light);font-weight:600}
+.stat .l{font-size:11px;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase}
+
+/* TABS */
+.tabs{display:flex;gap:2px;margin-bottom:20px;background:var(--bg2);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:4px}
+.tab{flex:1;padding:9px 8px;font-size:13px;font-family:'Cinzel',serif;letter-spacing:.03em;border:none;background:transparent;color:var(--text-dim);cursor:pointer;border-radius:7px;transition:all .2s}
+.tab:hover{color:var(--text);background:var(--bg3)}
+.tab.active{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);font-weight:600}
+.panel{display:none}.panel.active{display:block}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:16px;margin-bottom:12px}
+.card-gold{border-color:rgba(201,168,76,.4);background:linear-gradient(135deg,var(--bg2),var(--bg3))}
+.stitle{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+
+/* INPUTS */
+.irow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+input[type=text],input[type=date]{flex:1;min-width:120px;padding:9px 13px;border-radius:8px;border:1px solid rgba(201,168,76,.3);background:var(--bg3);color:var(--text);font-family:'Crimson Text',serif;font-size:15px}
+input:focus{outline:none;border-color:var(--gold)}
+.btn{padding:9px 20px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:var(--bg);border:none;border-radius:8px;font-family:'Cinzel',serif;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.05em;transition:opacity .2s}
+.btn:hover{opacity:.85}
+
+/* LETTERS */
+.lrow{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.lc{background:var(--bg3);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:5px 8px;text-align:center;min-width:34px}
+.lc .l{font-size:15px;font-weight:600;color:var(--gold-light)}
+.lc .v{font-size:10px;color:var(--text-muted)}
+.lc.sep{background:transparent;border:none;color:var(--text-muted);font-size:18px;display:flex;align-items:center}
+
+/* METRICS */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.met{background:var(--bg3);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:10px;text-align:center}
+.met .n{font-family:'Cinzel',serif;font-size:22px;font-weight:600;color:var(--gold)}
+.met .lb{font-size:10px;color:var(--text-muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.met .sub{font-size:11px;color:var(--text-dim);margin-top:2px}
+
+/* STEPS */
+.steps{font-size:14px;color:var(--text-dim);line-height:1.8;margin:8px 0}
+.steps strong{color:var(--gold-light)}
+
+/* INTERP BOX */
+.ibox{background:var(--bg3);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 14px;font-size:14px;color:var(--text-dim);line-height:1.7;margin-top:10px}
+.ibox strong{color:var(--gold-light)}
+
+/* SQUARE */
+.sqw{overflow-x:auto;margin:12px 0}
+table.sq{border-collapse:collapse;margin:0 auto}
+table.sq td{width:36px;height:33px;text-align:center;font-size:12px;font-family:'Cinzel',serif;border:1px solid rgba(201,168,76,.15);color:var(--text);cursor:pointer;transition:all .15s;user-select:none}
+table.sq td:hover{background:rgba(201,168,76,.15)!important;color:var(--gold-light)!important}
+td.hl{background:var(--blue-mid)!important;color:var(--gold-light)!important;font-weight:600;box-shadow:inset 0 0 8px rgba(201,168,76,.3)}
+td.ctr{background:var(--red-dark)!important;color:var(--gold-light)!important;font-weight:600;box-shadow:inset 0 0 10px rgba(139,0,0,.5)}
+td.dg{background:var(--blue-dark);color:#88aadd!important}
+td.hov{background:rgba(201,168,76,.25)!important;color:var(--gold-light)!important;font-weight:600;border-color:var(--gold)!important}
+
+/* LEGEND */
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text-muted);margin-top:8px}
+.ld{width:12px;height:12px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+
+/* GUIDE */
+.guide-num{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.1);align-items:flex-start}
+.guide-num:last-child{border:none}
+.gnum{width:28px;height:28px;border-radius:50%;background:var(--bg3);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:600;font-size:13px;color:var(--gold);flex-shrink:0}
+.gtxt .t{font-size:14px;font-weight:600;color:var(--gold-light)}
+.gtxt .d{font-size:13px;color:var(--text-dim);margin-top:2px;font-style:italic}
+
+/* PROPS TABLE */
+.prop-row{display:flex;gap:10px;padding:7px 10px;border-radius:6px;margin-bottom:4px;font-size:13px}
+.prop-row:nth-child(odd){background:var(--bg3)}
+.prop-k{color:var(--text-dim);flex:1}
+.prop-v{color:var(--gold-light);font-weight:600;text-align:right}
+
+/* HIDDEN */
+.hidden{display:none!important}
+
+/* RESPONSIVE */
+@media(max-width:480px){
+  table.sq td{width:30px;height:27px;font-size:10px}
+  .tab{font-size:11px;padding:8px 4px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <span class="moon-icon">🌕</span>
+    <h1>Carré Magique de la Lune<br>d'Henri Corneille Agrippa</h1>
+    <p>Géomatrie · Ésotérisme · Cycles Financiers</p>
+    <div class="stats">
+      <div class="stat"><div class="n">9×9</div><div class="l">81 cases</div></div>
+      <div class="stat"><div class="n">369</div><div class="l">Constante</div></div>
+      <div class="stat"><div class="n">41</div><div class="l">Centre</div></div>
+      <div class="stat"><div class="n">3321</div><div class="l">Somme totale</div></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="sw('prenom',this)">Prénom / Nom</button>
+    <button class="tab" onclick="sw('date',this)">Date</button>
+    <button class="tab" onclick="sw('carre',this)">Le Carré</button>
+    <button class="tab" onclick="sw('guide',this)">Guide</button>
+  </div>
+
+  <!-- PRENOM -->
+  <div class="panel active" id="p-prenom">
+    <div class="card card-gold">
+      <div class="stitle">Analyse géomatrique d'un nom</div>
+      <div class="irow">
+        <input type="text" id="iprenom" placeholder="Prénom" value="Samuel"/>
+        <input type="text" id="inom" placeholder="Nom (optionnel)" value="Honiat"/>
+        <button class="btn" onclick="doPrenom()">✦ Analyser</button>
+      </div>
+    </div>
+    <div id="rp" class="hidden">
+      <div class="card">
+        <div class="stitle">Lettres et valeurs pythagoriciennes</div>
+        <div class="lrow" id="lrp"></div>
+        <div class="steps" id="stp"></div>
+      </div>
+      <div class="card">
+        <div class="stitle">Résultats</div>
+        <div class="g3" id="metp"></div>
+        <div class="ibox" id="itp"></div>
+      </div>
+      <div class="card">
+        <div class="stitle">Position dans le Carré d'Agrippa</div>
+        <div class="steps" id="sqlp" style="margin-bottom:8px"></div>
+        <div class="sqw"><table class="sq" id="sqp"></table></div>
+        <div class="leg">
+          <div><span class="ld" style="background:#6b0000"></span>Centre 41</div>
+          <div><span class="ld" style="background:#1a3a6e"></span>Tes positions</div>
+          <div><span class="ld" style="background:#0e1f4a"></span>Diagonales</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATE -->
+  <div class="panel" id="p-date">
+    <div class="card card-gold">
+      <div class="stitle">Énergie lunaire d'une date</div>
+      <div class="irow">
+        <input type="date" id="idate" value="2026-05-31"/>
+        <button class="btn" onclick="doDate()">✦ Analyser</button>
+      </div>
+    </div>
+    <div id="rd" class="hidden">
+      <div class="card">
+        <div class="stitle">Décomposition numérique</div>
+        <div class="steps" id="std"></div>
+        <div class="g3" id="metd"></div>
+        <div class="ibox" id="itd"></div>
+      </div>
+      <div class="card">
+        <div class="stitle">Position dans le Carré d'Agrippa</div>
+        <div class="sqw"><table class="sq" id="sqd"></table></div>
+        <div class="leg">
+          <div><span class="ld" style="background:#6b0000"></span>Centre 41</div>
+          <div><span class="ld" style="background:#1a3a6e"></span>Position date</div>
+          <div><span class="ld" style="background:#0e1f4a"></span>Diagonales</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARRE -->
+  <div class="panel" id="p-carre">
+    <div class="card">
+      <div class="stitle">Clique sur n'importe quelle case pour l'analyser</div>
+      <div class="sqw"><table class="sq" id="sqe"></table></div>
+      <div class="leg">
+        <div><span class="ld" style="background:#6b0000"></span>Centre 41</div>
+        <div><span class="ld" style="background:#0e1f4a"></span>Diagonales</div>
+      </div>
+    </div>
+    <div class="card hidden" id="re">
+      <div class="stitle" id="et"></div>
+      <div class="g3" id="em"></div>
+      <div class="ibox" id="ei"></div>
+    </div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="panel" id="p-guide">
+    <div class="card">
+      <div class="stitle">Table de correspondance pythagoricienne</div>
+      <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:3px;text-align:center;margin-bottom:4px">
+        <div style="color:var(--gold);font-size:12px">A=1</div><div style="color:var(--gold);font-size:12px">B=2</div><div style="color:var(--gold);font-size:12px">C=3</div><div style="color:var(--gold);font-size:12px">D=4</div><div style="color:var(--gold);font-size:12px">E=5</div><div style="color:var(--gold);font-size:12px">F=6</div><div style="color:var(--gold);font-size:12px">G=7</div><div style="color:var(--gold);font-size:12px">H=8</div><div style="color:var(--gold);font-size:12px">I=9</div>
+        <div style="color:var(--text-dim);font-size:12px">J=1</div><div style="color:var(--text-dim);font-size:12px">K=2</div><div style="color:var(--text-dim);font-size:12px">L=3</div><div style="color:var(--text-dim);font-size:12px">M=4</div><div style="color:var(--text-dim);font-size:12px">N=5</div><div style="color:var(--text-dim);font-size:12px">O=6</div><div style="color:var(--text-dim);font-size:12px">P=7</div><div style="color:var(--text-dim);font-size:12px">Q=8</div><div style="color:var(--text-dim);font-size:12px">R=9</div>
+        <div style="color:var(--text-dim);font-size:12px">S=1</div><div style="color:var(--text-dim);font-size:12px">T=2</div><div style="color:var(--text-dim);font-size:12px">U=3</div><div style="color:var(--text-dim);font-size:12px">V=4</div><div style="color:var(--text-dim);font-size:12px">W=5</div><div style="color:var(--text-dim);font-size:12px">X=6</div><div style="color:var(--text-dim);font-size:12px">Y=7</div><div style="color:var(--text-dim);font-size:12px">Z=8</div><div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stitle">Propriétés du Carré d'Agrippa</div>
+      <div id="props"></div>
+    </div>
+    <div class="card">
+      <div class="stitle">Les 9 vibrations lunaires</div>
+      <div id="gn"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SQ=[[37,78,29,70,21,62,13,54,5],[6,38,79,30,71,22,63,14,46],[47,7,39,80,31,72,23,55,15],[16,48,8,40,81,32,64,24,56],[57,17,49,9,41,73,33,65,25],[26,58,18,50,1,42,74,34,66],[67,27,59,10,51,2,43,75,35],[36,68,19,60,11,52,3,44,76],[77,28,69,20,61,12,53,4,45]];
+const LM={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+const NL={1:'Commencement',2:'Dualité',3:'Créativité',4:'Fondation',5:'Pivot central',6:'Harmonie',7:'Mystère',8:'Maîtrise',9:'Cycle complet'};
+const NI={
+  1:'Énergie de pionnier — ouverture d\'un nouveau cycle lunaire. Nouvelle lune en géomatrie. Cycle de renouveau et d\'initiation.',
+  2:'Réceptivité et intuition lunaire. Forte sensibilité aux cycles émotionnels. Polarité yin — énergie d\'accueil et de réception.',
+  3:'Créativité et communication. Nombre des enseignants et des créateurs de contenu. Très favorable aux projets d\'expression publique.',
+  4:'Structure et fondation solide. Les projets construits sur un 4 perdurent dans le temps. Énergie d\'ancrage et de matérialisation.',
+  5:'Le pivot central — équilibre parfait des 9 forces lunaires. Position de pouvoir absolu dans le carré. Transformation et liberté.',
+  6:'Harmonie et responsabilité. Vénus résonne dans la constante 369 (3+6+9=18→9). Énergie de service et d\'équilibre relationnel.',
+  7:'Sagesse intérieure et mystère. 7 jours par phase lunaire — le nombre sacré universel. Recherche spirituelle et connaissance cachée.',
+  8:'Maîtrise karmique et infini. Le 8 couché est le symbole de l\'infini. Force intérieure profonde et transformation durable.',
+  9:'Accomplissement et fin de cycle. 9 est le nombre de la Lune en Kabbale. Fin de cycle — prépare le suivant avec sagesse.'
+};
+
+function rd(n){while(n>9)n=[...String(n)].reduce((a,b)=>a+parseInt(b),0);return n;}
+function cl(w){const s=w.toUpperCase().replace(/[^A-Z]/g,''),v=s.split('').map(l=>LM[l]||0),t=v.reduce((a,b)=>a+b,0);return{s,v,t,r:rd(t)};}
+function mets(items,el){document.getElementById(el).innerHTML=items.map(([a,b,c])=>`<div class="met"><div class="n">${b}</div><div class="lb">${a}</div>${c?`<div class="sub">${c}</div>`:''}</div>`).join('');}
+
+function bsq(id,hls,clickable){
+  const t=document.getElementById(id);t.innerHTML='';
+  const hs=new Set(hls);
+  const d1=new Set([0,10,20,30,40,50,60,70,80]);
+  SQ.forEach((row,r)=>{
+    const tr=document.createElement('tr');
+    row.forEach((val,c)=>{
+      const td=document.createElement('td');
+      td.textContent=val;
+      const i=r*9+c;
+      if(val===41)td.className='ctr';
+      else if(hs.has(val))td.className='hl';
+      else if(d1.has(i)||d1.has(r*9+(8-c)))td.className='dg';
+      if(clickable)td.onclick=()=>xCell(val,r,c);
+      tr.appendChild(td);
+    });
+    t.appendChild(tr);
+  });
+}
+
+function sw(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('p-'+name).classList.add('active');
+  if(name==='carre')bsq('sqe',[],true);
+}
+
+function doPrenom(){
+  const p=cl(document.getElementById('iprenom').value||'');
+  const n=cl(document.getElementById('inom').value||'');
+  const tt=p.t+n.t,tr2=rd(tt);
+  let lhtml=p.s.split('').map((l,i)=>`<div class="lc"><div class="l">${l}</div><div class="v">${p.v[i]}</div></div>`).join('');
+  if(n.s){lhtml+='<div class="lc sep">+</div>';lhtml+=n.s.split('').map((l,i)=>`<div class="lc"><div class="l">${l}</div><div class="v">${n.v[i]}</div></div>`).join('');}
+  document.getElementById('lrp').innerHTML=lhtml;
+  let steps=`<strong>${p.s}</strong> : ${p.v.join('+')} = <strong>${p.t}</strong> → réduit : <strong>${p.r}</strong> (${NL[p.r]||''})`;
+  if(n.s)steps+=`<br><strong>${n.s}</strong> : ${n.v.join('+')} = <strong>${n.t}</strong> → réduit : <strong>${n.r}</strong> (${NL[n.r]||''})`;
+  steps+=`<br><strong>Total complet : ${p.t}${n.s?'+'+n.t:''} = ${tt}</strong> → <strong style="color:var(--gold)">${tr2}</strong> — ${NL[tr2]||''}`;
+  document.getElementById('stp').innerHTML=steps;
+  mets([['Prénom brut',p.t,NL[p.r]],[n.s?'Nom brut':'—',n.s?n.t:'—',n.s?NL[n.r]:''],['Nombre maître',tr2,NL[tr2]]],'metp');
+  document.getElementById('itp').innerHTML=`<strong>${NL[tr2]} (${tr2})</strong> — ${NI[tr2]||''}`;
+  const hls=[];
+  if(p.t>=1&&p.t<=81)hls.push(p.t);
+  if(n.t>=1&&n.t<=81&&n.s)hls.push(n.t);
+  if(tt>=1&&tt<=81&&!hls.includes(tt))hls.push(tt);
+  let leg='';
+  SQ.forEach((row,r)=>row.forEach((v,c)=>{if(hls.includes(v))leg+=`<strong style="color:var(--gold-light)">${v}</strong> → ligne ${r+1}, colonne ${c+1} &nbsp;·&nbsp; `;}));
+  document.getElementById('sqlp').innerHTML=leg.replace(/\s·\s$/,'');
+  bsq('sqp',hls,false);
+  document.getElementById('rp').classList.remove('hidden');
+}
+
+function doDate(){
+  const d=document.getElementById('idate').value;if(!d)return;
+  const digs=[...d.replace(/-/g,'')].map(Number);
+  const tot=digs.reduce((a,b)=>a+b,0),red=rd(tot);
+  const pts=d.split('-'),fmt=pts[2]+'/'+pts[1]+'/'+pts[0];
+  document.getElementById('std').innerHTML=`Date : <strong>${fmt}</strong><br>${digs.join(' + ')} = <strong>${tot}</strong> → réduit : <strong style="color:var(--gold)">${red}</strong> (${NL[red]||''})`;
+  mets([['Somme brute',tot,''],['Nombre lunaire',red,NL[red]||''],['Case carré',tot<=81?tot:'—',tot>81?'Hors grille':'']],'metd');
+  document.getElementById('itd').innerHTML=`<strong>Énergie du ${fmt} : ${NL[red]} (${red})</strong><br>${NI[red]||''}`;
+  bsq('sqd',tot<=81?[tot]:[],false);
+  document.getElementById('rd').classList.remove('hidden');
+}
+
+function xCell(val,r,c){
+  const red=rd(val);
+  let pos;
+  if(r===4&&c===4)pos='Centre absolu — vibration 41';
+  else if(r===4)pos=`Ligne centrale (équilibre) · Colonne ${c+1}`;
+  else if(c===4)pos=`Ligne ${r+1} · Colonne centrale (équilibre)`;
+  else if(r===c||r+c===8)pos=`Diagonale · Ligne ${r+1} · Colonne ${c+1}`;
+  else pos=`Ligne ${r+1} · Colonne ${c+1}`;
+  document.getElementById('et').innerHTML=`Case <span style="color:var(--gold-light)">${val}</span> — ${pos}`;
+  mets([['Valeur',val,''],['Réduit',red,NL[red]||''],['Polarité',val%2===0?'Yin':'Yang',val%2===0?'Réceptif':'Actif']],'em');
+  document.getElementById('ei').innerHTML=`<strong>${NL[red]} (${red})</strong> — ${NI[red]||''}`;
+  document.getElementById('re').classList.remove('hidden');
+  document.querySelectorAll('#sqe td').forEach(td=>{
+    const v=parseInt(td.textContent);
+    if(v===41)td.className='ctr';
+    else{const i=[...document.querySelectorAll('#sqe td')].indexOf(td);const r2=Math.floor(i/9),c2=i%9;const d1=new Set([0,10,20,30,40,50,60,70,80]);td.className=(d1.has(i)||d1.has(r2*9+(8-c2)))?'dg':'';}
+    if(v===val)td.classList.add('hov');
+  });
+}
+
+// Build guide
+const props=[
+  ['Ordre','9 × 9 = 81 cases'],['Constante magique','369'],['Somme totale','3321 = 369 × 9'],
+  ['Centre','41 (vibration cœur = 123)'],['Réduction 369','3+6+9=18→9 (cycle lunaire)'],
+  ['Auteur','H.C. Agrippa (1486–1535)'],['Ouvrage','De Occulta Philosophia (1531)']
+];
+document.getElementById('props').innerHTML=props.map(([k,v])=>`<div class="prop-row"><span class="prop-k">${k}</span><span class="prop-v">${v}</span></div>`).join('');
+
+const gn=document.getElementById('gn');
+for(let i=1;i<=9;i++)gn.innerHTML+=`<div class="guide-num"><div class="gnum">${i}</div><div class="gtxt"><div class="t">${NL[i]}</div><div class="d">${NI[i]}</div></div></div>`;
+
+// Init
+doPrenom();
+doDate();
+</script>
+</body>
+</html>
